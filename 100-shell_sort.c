@@ -1,58 +1,48 @@
 #include "sort.h"
 
 /**
- * swap - Function that swaps two values
+ * get_max_gap - gets the a largest Knuth Sequence gap for this size
+ * @size: the size of the array
  *
- * @a: Fisrt value
- * @b: Second value
- * Return: 0
+ * Return: the gap size
  */
-void swap(int *a, int *b)
+size_t get_max_gap(size_t size)
 {
-	int tmp;
+	size_t n;
 
-	tmp = *b;
-	*b = *a;
-	*a = tmp;
+	n = 1;
+	while (n < size)
+		n = n * 3 + 1;
+	return ((n - 1) / 3);
 }
 
 /**
- * gap_sort - sort array with gaps
- * @array: array to be sorted
- * @size: size of array
- * @gap: gap size
- */
-void gap_sort(int *array, size_t size, unsigned int gap)
-{
-	size_t j, k;
-
-	for (j = gap; j < size; j++)
-	{
-		k = j;
-		while (k >= gap && array[k] < array[k - gap])
-		{
-			swap(array + k, array + k - gap);
-			k -= gap;
-		}
-	}
-}
-
-/**
- * shell_sort - shell sort
- * @array: array to be sorted
- * @size: size of array
+ * shell_sort - shell_sort
+ * @array: the integer array to sort
+ * @size: the size of the array
+ *
+ * Return: void
  */
 void shell_sort(int *array, size_t size)
 {
-	unsigned int gap = 1;
+	size_t gap, i, j;
+	int temp;
 
-	while (gap < size / 3)
-		gap = gap * 3 + 1;
+	if (!array || !size)
+		return;
 
-	while (gap >= 1)
+
+	for (gap = get_max_gap(size); gap; gap = (gap - 1) / 3)
 	{
-		gap_sort(array, size, gap);
-		gap = (gap - 1) / 3;
+		for (i = gap; i < size; i++)
+		{
+			temp = array[i];
+			for (j = i; j > gap - 1 && array[j - gap] > temp; j -= gap)
+			{
+				array[j] = array[j - gap];
+			}
+			array[j] = temp;
+		}
 		print_array(array, size);
 	}
 }

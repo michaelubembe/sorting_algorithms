@@ -1,61 +1,83 @@
 #include "sort.h"
-#include <stdlib.h>
-#include <stdio.h>
 
 /**
- * _merge_sort - initiate merge sort
- * @array: array to be sorted
- * @temp: temporary array for holding sorted elements
- * @size: size of the array
+ * merge_compare - compares merges
+ * @array: the integer array to sort
+ * @start: the start index
+ * @stop: the stop index
+ * @new: the output array
+ *
+ * Return: void.
  */
-void _merge_sort(int *array, int *temp, size_t size)
+void merge_compare(int *array, size_t start, size_t stop, int *new)
 {
-	size_t half = size / 2, i = 0, j = 0, k;
+	size_t i = start, j, k, mid;
 
-	if (size < 2)
-		return;
-
-	_merge_sort(array, temp, half);
-	_merge_sort(array + half, temp + half, size - half);
-
+	j = mid = (start + stop) / 2;
 	printf("Merging...\n");
 	printf("[left]: ");
-	print_array(array, half);
+	print_array(array + start, mid - start);
 	printf("[right]: ");
-	print_array(array + half, size - half);
-	for (k = 0; k < size; k++)
-		if (j >= size - half || (i < half && array[i] < (array + half)[j]))
+	print_array(array + mid, stop - mid);
+	for (k = start; k < stop; k++)
+		if (i < mid && (j >= stop || array[i] <= array[j]))
 		{
-			temp[k] = array[i];
-			i++;
+
+			new[k] = array[i++];
 		}
 		else
 		{
-			temp[k] = (array + half)[j];
-			j++;
+			new[k] = array[j++];
 		}
-	for (k = 0; k < size; k++)
-		array[k] = temp[k];
 	printf("[Done]: ");
-	print_array(array, size);
+	print_array(new + start, stop - start);
 }
 
 /**
- * merge_sort - initiate merge sort
- * @array: array to be sorted
- * @size: size of the array
+ * merge_sort_top_down - sorts top-down recursively
+ * @array: the integer array to sort
+ * @start: the start index
+ * @stop: the stop index
+ * @new: the output array
+ *
+ * Return: void.
+ */
+void merge_sort_top_down(int *array, size_t start, size_t stop, int *new)
+{
+	size_t mid;
+
+	mid = (start + stop) / 2;
+	if (stop - start < 2)
+	{
+		return;
+	}
+	merge_sort_top_down(new, start, mid, array);
+	merge_sort_top_down(new, mid, stop, array);
+	merge_compare(new, start, stop, array);
+}
+
+
+/**
+ * merge_sort - sorts by merge sort algorithm
+ * @array: the integer array to sort
+ * @size: the size of the array
+ *
+ * Return: void.
  */
 void merge_sort(int *array, size_t size)
 {
-	int *temp;
+	int *new;
+	size_t i;
+
 
 	if (!array || size < 2)
 		return;
 
-	temp = malloc(sizeof(*temp) * size);
-	if (!temp)
+	new = malloc(sizeof(int) * size);
+	if (!new)
 		return;
-
-	_merge_sort(array, temp, size);
-	free(temp);
+	for (i = 0; i < size; i++)
+		new[i] = array[i];
+	merge_sort_top_down(array, 0, size, new);
+	free(new);
 }

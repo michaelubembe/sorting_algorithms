@@ -1,67 +1,72 @@
 #include "sort.h"
-#include <limits.h>
-#include <stdlib.h>
-
 /**
- * get_max - Find max value in array of integers
- *
- * @array: array to find max value of
- * @size: size of the array
- * Return: 0
- */
-int get_max(int *array, size_t size)
+*integer_count- number of times integer appears in an array
+*
+*@array: array given
+*@size: size of array
+*@range: number to check for occurance
+*
+*Return: number of occurances
+*/
+int integer_count(int *array, size_t size, int range)
 {
-	int max = INT_MIN;
+	int total = 0;
+	size_t i;
 
-	while (size--)
-		if (array[size] > max)
-			max = array[size];
-
-	return (max);
+	for (i = 0; i < size; i++)
+	{
+		if (array[i] == range)
+			total++;
+	}
+	return (total);
 }
 
 /**
- * counting_sort - sort an array
- * @array: array to sort
- * @size: size of array to sort
- */
+*counting_sort - counting sort algorithm
+*
+*@array: array to be sorted
+*@size: size of the array
+*/
 void counting_sort(int *array, size_t size)
 {
-	int *temp, *cpy, j, max;
-	size_t i;
+	int k = 0, b = 0, r = 0;
+	size_t i, c;
+	int *array2, *newArray;
 
 	if (!array || size < 2)
 		return;
-
-	max = get_max(array, size);
-	temp = calloc(max + 1, sizeof(*temp));
-	if (!temp)
-		return;
-
-	cpy = malloc(sizeof(*cpy) * size);
-	if (!cpy)
-	{
-		free(temp);
-		return;
-	}
-
-	for (i = 0; i < size; i++)
-		temp[array[i]]++;
-
-	for (j = 1; j < max + 1; j++)
-		temp[j] += temp[j - 1];
-
-	print_array(temp, max + 1);
-
 	for (i = 0; i < size; i++)
 	{
-		temp[array[i]]--;
-		cpy[temp[array[i]]] = array[i];
+		if (array[i] > k)
+		{
+			k = array[i];
+		}
 	}
-
+	array2 = malloc(sizeof(int) * (k + 1));
+	if (!array2)
+		return;
+	for (c = 0; c < ((size_t)k + 1); c++)
+	{
+		if (c == 0)
+			array2[c] = integer_count(array, size, r);
+		else
+		{
+			b = array2[c - 1] + integer_count(array, size, r);
+			array2[c] = b;
+		}
+		r++;
+	}
+	print_array(array2, (k + 1));
+	newArray = malloc(sizeof(int) * size);
+	if (!newArray)
+	{
+		free(array2);
+		return;
+	}
 	for (i = 0; i < size; i++)
-		array[i] = cpy[i];
-
-	free(temp);
-	free(cpy);
+		newArray[array2[array[i]]-- - 1] = array[i];
+	for (i = 0; i < size; i++)
+		array[i] = newArray[i];
+	free(newArray);
+	free(array2);
 }
